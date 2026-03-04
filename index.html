@@ -1,409 +1,1068 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Limon Loco M — Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
-<style>
-:root {
-  --bg: #e8ecf1;
-  --card: #e8ecf1;
-  --shadow-light: rgba(255,255,255,0.7);
-  --shadow-dark: rgba(163,177,198,0.6);
-  --text-primary: #2d3436;
-  --text-secondary: #636e72;
-  --text-muted: #b2bec3;
-  --accent: #6c5ce7;
-  --accent2: #00cec9;
-  --accent3: #0984e3;
-  --positive: #00b894;
-  --negative: #d63031;
-  --radius: 16px;
-  --gap: 20px;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text-primary); min-height:100vh; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limon Loco All Parks Dashboard v4</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.dashboard { max-width:1360px; margin:0 auto; padding:32px 24px; }
+        :root {
+            --bg: #e8ecf1;
+            --sd: rgba(163, 177, 198, 0.6);
+            --sl: rgba(255, 255, 255, 0.7);
+            --primary: #2d3436;
+            --secondary: #636e72;
+            --muted: #b2bec3;
+            --accent: #6c5ce7;
+            --positive: #00b894;
+            --negative: #d63031;
+            --park-m: #6c5ce7;
+            --park-b: #e17055;
+            --park-c: #00cec9;
+            --rfm-champions: #6c5ce7;
+            --rfm-loyal: #00cec9;
+            --rfm-potential: #0984e3;
+            --rfm-at-risk: #fdcb6e;
+            --rfm-lost: #d63031;
+        }
 
-/* Neumorphic card */
-.card {
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-  padding: 24px;
-  transition: all 0.2s ease;
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--primary);
+            padding: 20px;
+        }
 
-/* Header */
-.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; flex-wrap:wrap; gap:16px; }
-.header h1 { font-size:26px; font-weight:700; color:var(--text-primary); letter-spacing:-0.5px; }
-.header h1 span { color:var(--accent); }
-.header-sub { font-size:13px; color:var(--text-secondary); margin-top:2px; }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
 
-.filters { display:flex; gap:10px; align-items:center; }
-.filter-btn {
-  background: var(--card);
-  border: none;
-  border-radius: 10px;
-  padding: 10px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
-  transition: all 0.15s ease;
-}
-.filter-btn:hover { color: var(--accent); }
-.filter-btn.active {
-  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-  color: var(--accent);
-  font-weight: 600;
-}
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-/* KPI Row */
-.kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:var(--gap); margin-bottom:var(--gap); }
-.kpi { text-align:center; }
-.kpi .label { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:8px; font-weight:600; }
-.kpi .value { font-size:28px; font-weight:700; color:var(--text-primary); }
-.kpi .sub { font-size:12px; margin-top:6px; font-weight:500; }
-.kpi .sub.up { color:var(--positive); }
-.kpi .sub.down { color:var(--negative); }
-.kpi .sub.neutral { color:var(--text-muted); }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
 
-/* Chart grid */
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:var(--gap); margin-bottom:var(--gap); }
-.grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--gap); margin-bottom:var(--gap); }
-.full-width { margin-bottom:var(--gap); }
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 12px;
+            letter-spacing: 0.5px;
+        }
 
-.card h3 {
-  font-size:13px; font-weight:600; color:var(--text-secondary);
-  text-transform:uppercase; letter-spacing:0.5px; margin-bottom:16px;
-}
-.chart-wrap { position:relative; width:100%; }
-.chart-wrap.h350 { height:320px; }
-.chart-wrap.h280 { height:260px; }
-.chart-wrap.h220 { height:200px; }
+        .subtitle {
+            color: var(--secondary);
+            font-size: 14px;
+            margin-top: 8px;
+        }
 
-/* Table */
-.table-wrap { overflow-x:auto; }
-table { width:100%; border-collapse:collapse; font-size:13px; }
-th { text-align:left; padding:10px 12px; color:var(--text-muted); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; font-weight:600; border-bottom:2px solid rgba(163,177,198,0.3); }
-td { padding:10px 12px; border-bottom:1px solid rgba(163,177,198,0.15); }
-tr:hover td { background:rgba(108,92,231,0.04); }
-.text-right { text-align:right; }
-.yoy-pos { color:var(--positive); font-weight:600; }
-.yoy-neg { color:var(--negative); font-weight:600; }
+        .filter-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
-/* Segment badge */
-.seg-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+        .filter-label {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 60px;
+        }
 
-footer { text-align:center; color:var(--text-muted); font-size:11px; padding:24px 0 8px; letter-spacing:0.3px; }
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
 
-@media(max-width:900px) {
-  .kpis { grid-template-columns:repeat(2,1fr); }
-  .grid-2, .grid-3 { grid-template-columns:1fr; }
-}
-@media(max-width:600px) {
-  .kpis { grid-template-columns:1fr 1fr; }
-  .dashboard { padding:16px 12px; }
-}
-</style>
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 12px;
+            background: var(--bg);
+            color: var(--secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 6px 6px 12px var(--sd), -6px -6px 12px var(--sl);
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 16px var(--sd), -8px -8px 16px var(--sl);
+        }
+
+        .btn.active {
+            color: white;
+            background: var(--accent);
+            box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
+        }
+
+        .btn-park-m.active { background: var(--park-m); }
+        .btn-park-b.active { background: var(--park-b); }
+        .btn-park-c.active { background: var(--park-c); }
+
+        .card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 6px 6px 12px var(--sd), -6px -6px 12px var(--sl);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 6px 6px 12px var(--sd), -6px -6px 12px var(--sl);
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .positive { color: var(--positive); }
+        .negative { color: var(--negative); }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid-full {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--bg), var(--bg));
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid var(--muted);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--muted);
+            color: var(--primary);
+        }
+
+        tr:hover {
+            background: rgba(163, 177, 198, 0.2);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 40px 0 20px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .stat-small {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .color-champion { color: var(--rfm-champions); font-weight: 600; }
+        .color-loyal { color: var(--rfm-loyal); font-weight: 600; }
+        .color-potential { color: var(--rfm-potential); font-weight: 600; }
+        .color-at-risk { color: var(--rfm-at-risk); font-weight: 600; }
+        .color-lost { color: var(--rfm-lost); font-weight: 600; }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .kpi-row { grid-template-columns: 1fr; }
+            .btn { padding: 8px 12px; font-size: 12px; }
+        }
+    </style>
 </head>
 <body>
-<div class="dashboard">
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>Limon Loco All Parks <span class="badge">DRAFT v4</span></h1>
+            <p class="subtitle">M + B + C Combined · Jan 2024 — Feb 2026</p>
+        </div>
 
-  <div class="header">
-    <div>
-      <h1><span>Limon Loco</span> M</h1>
-      <div class="header-sub">Business Dashboard  ·  Jan 2024 — Jan 2026</div>
+        <!-- TIME FILTER ROW -->
+        <div class="filter-row">
+            <span class="filter-label">Period:</span>
+            <div class="filter-buttons">
+                <button class="btn active" onclick="setTimeView('all')">All History</button>
+                <button class="btn" onclick="setTimeView('2024')">2024</button>
+                <button class="btn" onclick="setTimeView('2025')">2025</button>
+                <button class="btn" onclick="setTimeView('2026')">2026</button>
+                <button class="btn" onclick="setTimeView('feb')">Feb 2026</button>
+            </div>
+        </div>
+
+        <!-- PARK FILTER ROW -->
+        <div class="filter-row">
+            <span class="filter-label">Park:</span>
+            <div class="filter-buttons">
+                <button class="btn active" onclick="setParkView('ALL')">All Parks</button>
+                <button class="btn btn-park-m" onclick="setParkView('M')">Park M</button>
+                <button class="btn btn-park-b" onclick="setParkView('B')">Park B</button>
+                <button class="btn btn-park-c" onclick="setParkView('C')">Park C</button>
+            </div>
+        </div>
+
+        <!-- KPI ROW -->
+        <div class="kpi-row" id="kpiRow"></div>
+
+        <!-- CHARTS SECTION -->
+        <div class="section-title">Overview</div>
+
+        <div class="grid-full">
+            <div class="card">
+                <div class="card-title">Revenue by Park</div>
+                <div class="chart-container">
+                    <canvas id="chartRevenueByPark"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-full">
+            <div class="card">
+                <div class="card-title">Total Monthly Revenue & Checks</div>
+                <div class="chart-container">
+                    <canvas id="chartMonthlyRevenue"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">Revenue by Category</div>
+                <div class="chart-container">
+                    <canvas id="chartCategory"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Client Segments</div>
+                <div class="chart-container">
+                    <canvas id="chartSegments"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">Revenue by Day of Week</div>
+                <div class="chart-container">
+                    <canvas id="chartDow"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Hourly Distribution</div>
+                <div class="chart-container">
+                    <canvas id="chartHourly"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">Weekend vs Weekday</div>
+                <div class="chart-container">
+                    <canvas id="chartWeekend"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">RFM Segments Overview</div>
+                <div class="chart-container">
+                    <canvas id="chartRFMOverview"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLES SECTION -->
+        <div class="section-title">Top Items & Details</div>
+
+        <div class="card">
+            <div class="card-title">Top 10 Items</div>
+            <div style="overflow-x: auto;">
+                <table id="tableTopItems">
+                    <thead><tr><th>Rank</th><th>Item</th><th>Revenue</th><th>Qty</th><th>Avg Price</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Monthly Detail</div>
+            <div style="overflow-x: auto;">
+                <table id="tableMonthly">
+                    <thead><tr><th>Month</th><th>Revenue</th><th>Checks</th><th>Avg Check</th><th>Clients</th><th>YoY</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Park Breakdown — Feb 2026</div>
+            <div style="overflow-x: auto;">
+                <table id="tableParkFeb">
+                    <thead><tr><th>Park</th><th>Revenue</th><th>Checks</th><th>Clients</th><th>Avg Check</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RFM DEEP DIVE SECTION -->
+        <div class="section-title">RFM Deep Dive</div>
+
+        <div class="grid-full">
+            <div class="card">
+                <div class="card-title">RFM Segment Distribution</div>
+                <div class="chart-container">
+                    <canvas id="chartRFMDistribution"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">Revenue by RFM Segment</div>
+                <div class="chart-container">
+                    <canvas id="chartRFMRevenue"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">RFM Metrics</div>
+                <div style="overflow-x: auto;">
+                    <table id="tableRFMMetrics">
+                        <thead><tr><th>Segment</th><th>Clients</th><th>Revenue</th><th>Avg Rec</th><th>Avg Freq</th><th>Avg Mon</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-full">
+            <div class="card">
+                <div class="card-title">Client Segment × RFM Crosstab</div>
+                <div style="overflow-x: auto;">
+                    <table id="tableRFMCrosstab">
+                        <thead><tr><th>RFM Segment</th><th>New (1-2)</th><th>Occasional (3-6)</th><th>Regular (7-14)</th><th>Loyal (15-29)</th><th>Champion (30+)</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-full">
+            <div class="card">
+                <div class="card-title">RFM Migration Potential (Active vs Inactive)</div>
+                <div class="chart-container">
+                    <canvas id="chartRFMMigration"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">RFM Summary Stats</div>
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Clients</div>
+                    <div class="kpi-value" id="rfmTotalClients">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Avg Recency (days)</div>
+                    <div class="kpi-value" id="rfmAvgRecency">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Avg Frequency</div>
+                    <div class="kpi-value" id="rfmAvgFrequency">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Avg Monetary (€)</div>
+                    <div class="kpi-value" id="rfmAvgMonetary">—</div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div class="filters" id="yearFilters"></div>
-  </div>
 
-  <div class="kpis" id="kpiRow"></div>
+    <script>
+        // ============ DATA ============
+        const D_monthly = [
+            {"m":"2024-01","y":2024,"mn":1,"r":33405.03,"ch":2253,"ac":14.83,"cl":310},
+            {"m":"2024-02","y":2024,"mn":2,"r":43601.43,"ch":2654,"ac":16.43,"cl":1678},
+            {"m":"2024-03","y":2024,"mn":3,"r":45434.08,"ch":2886,"ac":15.74,"cl":1812},
+            {"m":"2024-04","y":2024,"mn":4,"r":27620.69,"ch":1761,"ac":15.68,"cl":1157},
+            {"m":"2024-05","y":2024,"mn":5,"r":28542.25,"ch":1646,"ac":17.34,"cl":1060},
+            {"m":"2024-06","y":2024,"mn":6,"r":25067.32,"ch":1617,"ac":15.5,"cl":994},
+            {"m":"2024-07","y":2024,"mn":7,"r":49915.36,"ch":3860,"ac":12.93,"cl":1623},
+            {"m":"2024-08","y":2024,"mn":8,"r":130050.92,"ch":11581,"ac":11.23,"cl":1364},
+            {"m":"2024-09","y":2024,"mn":9,"r":99648.28,"ch":8209,"ac":12.14,"cl":1090},
+            {"m":"2024-10","y":2024,"mn":10,"r":86081.45,"ch":7143,"ac":12.05,"cl":1024},
+            {"m":"2024-11","y":2024,"mn":11,"r":90791.96,"ch":6384,"ac":14.22,"cl":989},
+            {"m":"2024-12","y":2024,"mn":12,"r":79082.46,"ch":5429,"ac":14.57,"cl":1322},
+            {"m":"2025-01","y":2025,"mn":1,"r":83404.93,"ch":5614,"ac":14.86,"cl":1682},
+            {"m":"2025-02","y":2025,"mn":2,"r":81820.59,"ch":5754,"ac":14.22,"cl":2086},
+            {"m":"2025-03","y":2025,"mn":3,"r":101946.17,"ch":7126,"ac":14.31,"cl":2472},
+            {"m":"2025-04","y":2025,"mn":4,"r":72635.73,"ch":5313,"ac":13.67,"cl":2073},
+            {"m":"2025-05","y":2025,"mn":5,"r":70545.2,"ch":5166,"ac":13.66,"cl":2006},
+            {"m":"2025-06","y":2025,"mn":6,"r":60262.91,"ch":4375,"ac":13.77,"cl":1709},
+            {"m":"2025-07","y":2025,"mn":7,"r":126716.32,"ch":8198,"ac":15.46,"cl":2954},
+            {"m":"2025-08","y":2025,"mn":8,"r":192073.04,"ch":12086,"ac":15.89,"cl":4758},
+            {"m":"2025-09","y":2025,"mn":9,"r":181573.83,"ch":9155,"ac":19.83,"cl":3571},
+            {"m":"2025-10","y":2025,"mn":10,"r":161620.39,"ch":7781,"ac":20.77,"cl":3787},
+            {"m":"2025-11","y":2025,"mn":11,"r":212759.28,"ch":9498,"ac":22.4,"cl":4426},
+            {"m":"2025-12","y":2025,"mn":12,"r":164037.32,"ch":8893,"ac":18.45,"cl":4628},
+            {"m":"2026-01","y":2026,"mn":1,"r":216419.9,"ch":10376,"ac":20.86,"cl":5938},
+            {"m":"2026-02","y":2026,"mn":2,"r":181762.08,"ch":9061,"ac":20.06,"cl":4938}
+        ];
 
-  <div class="full-width card">
-    <h3>Revenue Trend</h3>
-    <div class="chart-wrap h350"><canvas id="revChart"></canvas></div>
-  </div>
+        const D_park = {
+            M:[{"m":"2024-01","r":33405.03,"ch":2253,"cl":310,"ac":15.89},{"m":"2024-02","r":43601.43,"ch":2654,"cl":1678,"ac":18.11},{"m":"2024-03","r":45434.08,"ch":2886,"cl":1812,"ac":17.4},{"m":"2024-04","r":27620.69,"ch":1761,"cl":1157,"ac":17.36},{"m":"2024-05","r":28542.25,"ch":1646,"cl":1060,"ac":22.84},{"m":"2024-06","r":25067.32,"ch":1617,"cl":994,"ac":18.66},{"m":"2024-07","r":29947.69,"ch":2013,"cl":1133,"ac":19.16},{"m":"2024-08","r":38289.53,"ch":2522,"cl":1175,"ac":17.62},{"m":"2024-09","r":35384.13,"ch":2246,"cl":931,"ac":20.77},{"m":"2024-10","r":33205.81,"ch":1996,"cl":937,"ac":22.22},{"m":"2024-11","r":36596.21,"ch":2067,"cl":866,"ac":22.15},{"m":"2024-12","r":28697.66,"ch":1653,"cl":778,"ac":22.88},{"m":"2025-01","r":34070.29,"ch":1858,"cl":965,"ac":22.8},{"m":"2025-02","r":36933.55,"ch":2219,"cl":1304,"ac":19.02},{"m":"2025-03","r":44631.8,"ch":2603,"cl":1335,"ac":21.22},{"m":"2025-04","r":34040.94,"ch":2041,"cl":1107,"ac":19.78},{"m":"2025-05","r":29635.36,"ch":1696,"cl":948,"ac":23.32},{"m":"2025-06","r":25203.8,"ch":1525,"cl":747,"ac":21.99},{"m":"2025-07","r":41868.95,"ch":2383,"cl":1123,"ac":25.97},{"m":"2025-08","r":47507.65,"ch":3198,"cl":1736,"ac":18.75},{"m":"2025-09","r":37720.84,"ch":2290,"cl":1213,"ac":22.39},{"m":"2025-10","r":31355.34,"ch":1713,"cl":976,"ac":31.24},{"m":"2025-11","r":38124.52,"ch":1971,"cl":1115,"ac":32.1},{"m":"2025-12","r":28708.25,"ch":1578,"cl":921,"ac":26.65},{"m":"2026-01","r":36621.87,"ch":2035,"cl":1258,"ac":26.5},{"m":"2026-02","r":30910.05,"ch":1882,"cl":1163,"ac":22.22}],
+            B:[{"m":"2025-07","r":38740.97,"ch":1801,"cl":468,"ac":29.82},{"m":"2025-08","r":90473.55,"ch":4145,"cl":1583,"ac":32.15},{"m":"2025-09","r":98333.71,"ch":3148,"cl":1217,"ac":63.15},{"m":"2025-10","r":92211.45,"ch":2835,"cl":1144,"ac":61.77},{"m":"2025-11","r":129594.8,"ch":4136,"cl":1490,"ac":49.51},{"m":"2025-12","r":91642.48,"ch":3877,"cl":1480,"ac":42.04},{"m":"2026-01","r":130805.23,"ch":4518,"cl":2244,"ac":44.0},{"m":"2026-02","r":116188.98,"ch":4382,"cl":2064,"ac":37.57}],
+            C:[{"m":"2024-07","r":19967.67,"ch":1847,"cl":491,"ac":14.68},{"m":"2024-08","r":91761.39,"ch":9059,"cl":190,"ac":12.48},{"m":"2024-09","r":64264.15,"ch":5963,"cl":160,"ac":14.0},{"m":"2024-10","r":52875.64,"ch":5147,"cl":88,"ac":13.74},{"m":"2024-11","r":54195.75,"ch":4317,"cl":124,"ac":16.79},{"m":"2024-12","r":50384.8,"ch":3776,"cl":545,"ac":19.67},{"m":"2025-01","r":49334.64,"ch":3756,"cl":718,"ac":19.51},{"m":"2025-02","r":44887.04,"ch":3535,"cl":783,"ac":19.69},{"m":"2025-03","r":57314.37,"ch":4523,"cl":1139,"ac":16.45},{"m":"2025-04","r":38594.79,"ch":3272,"cl":968,"ac":16.1},{"m":"2025-05","r":40909.84,"ch":3470,"cl":1059,"ac":17.16},{"m":"2025-06","r":35059.11,"ch":2850,"cl":963,"ac":23.26},{"m":"2025-07","r":46106.4,"ch":4014,"cl":1368,"ac":14.96},{"m":"2025-08","r":54091.84,"ch":4743,"cl":1449,"ac":14.56},{"m":"2025-09","r":45519.28,"ch":3717,"cl":1148,"ac":20.11},{"m":"2025-10","r":38053.6,"ch":3233,"cl":1672,"ac":13.95},{"m":"2025-11","r":45039.96,"ch":3391,"cl":1830,"ac":16.62},{"m":"2025-12","r":43686.59,"ch":3438,"cl":2244,"ac":14.67},{"m":"2026-01","r":48992.8,"ch":3823,"cl":2449,"ac":14.78},{"m":"2026-02","r":34663.05,"ch":2797,"cl":1727,"ac":15.07}]
+        };
 
-  <div class="grid-2">
-    <div class="card">
-      <h3>Revenue by Category</h3>
-      <div class="chart-wrap h280"><canvas id="catChart"></canvas></div>
-    </div>
-    <div class="card">
-      <h3>Client Segments <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text-muted)">(excl. retail walk-ins)</span></h3>
-      <div class="chart-wrap h280"><canvas id="segChart"></canvas></div>
-    </div>
-  </div>
+        const D_cats = {
+            ALL:{all:[{c:"Rental 1h",r:492565,p:30.4},{c:"Other",r:288274,p:17.8},{c:"Food/Menu",r:178793,p:11.0},{c:"Pass",r:164742,p:10.2},{c:"Rental 30m",r:142824,p:8.8},{c:"Voucher/Bonus",r:139546,p:8.6},{c:"Socks",r:100096,p:6.2},{c:"Children",r:58663,p:3.6},{c:"Birthday",r:54198,p:3.3}],feb:[{c:"Other",r:46864,p:27.7},{c:"Food/Menu",r:33389,p:19.8},{c:"Rental 1h",r:25826,p:15.3},{c:"Birthday",r:23111,p:13.7},{c:"Pass",r:15805,p:9.4},{c:"Rental 30m",r:9424,p:5.6},{c:"Socks",r:8982,p:5.3},{c:"Children",r:5612,p:3.3}]},
+            M:{all:[{c:"Rental 1h",r:438950,p:48.6},{c:"Birthday",r:103883,p:11.5},{c:"Pass",r:95331,p:10.6},{c:"Food/Menu",r:82730,p:9.2},{c:"Rental 30m",r:72352,p:8.0},{c:"Other",r:39973,p:4.4}],feb:[{c:"Rental 1h",r:11361,p:36.8},{c:"Birthday",r:7205,p:23.3},{c:"Pass",r:4865,p:15.7},{c:"Other",r:2385,p:7.7},{c:"Rental 30m",r:1520,p:4.9},{c:"Socks",r:1496,p:4.8}]},
+            B:{all:[{c:"Other",r:366498,p:46.5},{c:"Food/Menu",r:157532,p:20.0},{c:"Voucher/Bonus",r:91339,p:11.6},{c:"Socks",r:73336,p:9.3},{c:"Children",r:50339,p:6.4},{c:"Birthday",r:38770,p:4.9}],feb:[{c:"Other",r:51635,p:44.4},{c:"Food/Menu",r:29295,p:25.2},{c:"Birthday",r:14906,p:12.8},{c:"Pass",r:9464,p:8.2},{c:"Socks",r:6962,p:6.0},{c:"Children",r:3926,p:3.4}]},
+            C:{all:[{c:"Rental 1h",r:420171,p:44.0},{c:"Rental 30m",r:237151,p:24.8},{c:"Socks",r:74209,p:7.8},{c:"Other",r:65475,p:6.9},{c:"Pass",r:59947,p:6.3},{c:"Food/Menu",r:48993,p:5.1}],feb:[{c:"Rental 1h",r:14465,p:41.7},{c:"Rental 30m",r:7904,p:22.8},{c:"Food/Menu",r:4181,p:12.1},{c:"Socks",r:2576,p:7.4},{c:"Other",r:2017,p:5.8},{c:"Pass",r:1476,p:4.3}]}
+        };
 
-  <div class="grid-3">
-    <div class="card">
-      <h3>Day of Week</h3>
-      <div class="chart-wrap h220"><canvas id="dowChart"></canvas></div>
-    </div>
-    <div class="card">
-      <h3>Peak Hours</h3>
-      <div class="chart-wrap h220"><canvas id="hourChart"></canvas></div>
-    </div>
-    <div class="card">
-      <h3>Weekend vs Weekday</h3>
-      <div class="chart-wrap h220"><canvas id="wkdChart"></canvas></div>
-    </div>
-  </div>
+        const D_dow = {
+            ALL:{all:[{d:"Mon",r:230239},{d:"Tue",r:225326},{d:"Wed",r:248158},{d:"Thu",r:252078},{d:"Fri",r:385740},{d:"Sat",r:766213},{d:"Sun",r:539065}],feb:[{d:"Mon",r:15588},{d:"Tue",r:14648},{d:"Wed",r:13552},{d:"Thu",r:12733},{d:"Fri",r:28023},{d:"Sat",r:51859},{d:"Sun",r:45358}]},
+            M:{all:[{d:"Mon",r:83805},{d:"Tue",r:88411},{d:"Wed",r:96067},{d:"Thu",r:99105},{d:"Fri",r:121270},{d:"Sat",r:220399},{d:"Sun",r:194069}],feb:[{d:"Mon",r:2176},{d:"Tue",r:2785},{d:"Wed",r:3013},{d:"Thu",r:3047},{d:"Fri",r:5481},{d:"Sat",r:7219},{d:"Sun",r:7190}]},
+            B:{all:[{d:"Mon",r:63546},{d:"Tue",r:59940},{d:"Wed",r:70943},{d:"Thu",r:61449},{d:"Fri",r:117909},{d:"Sat",r:243655},{d:"Sun",r:170549}],feb:[{d:"Mon",r:10855},{d:"Tue",r:9429},{d:"Wed",r:8268},{d:"Thu",r:6724},{d:"Fri",r:15570},{d:"Sat",r:34277},{d:"Sun",r:31066}]},
+            C:{all:[{d:"Mon",r:82889},{d:"Tue",r:76975},{d:"Wed",r:81147},{d:"Thu",r:91523},{d:"Fri",r:146562},{d:"Sat",r:302159},{d:"Sun",r:174447}],feb:[{d:"Mon",r:2558},{d:"Tue",r:2434},{d:"Wed",r:2271},{d:"Thu",r:2963},{d:"Fri",r:6972},{d:"Sat",r:10363},{d:"Sun",r:7102}]}
+        };
 
-  <div class="grid-2">
-    <div class="card">
-      <h3>Top 10 Items</h3>
-      <div class="table-wrap"><table id="itemsTable"><thead><tr><th>Item</th><th class="text-right">Revenue</th><th class="text-right">Qty</th></tr></thead><tbody></tbody></table></div>
-    </div>
-    <div class="card">
-      <h3>Monthly Detail</h3>
-      <div class="table-wrap" style="max-height:400px;overflow-y:auto"><table id="monthTable"><thead><tr><th>Period</th><th class="text-right">Revenue</th><th class="text-right">Checks</th><th class="text-right">YoY</th></tr></thead><tbody></tbody></table></div>
-    </div>
-  </div>
+        const D_hr = {
+            ALL:{all:[{h:10,r:42456},{h:11,r:115513},{h:12,r:141519},{h:13,r:97743},{h:14,r:84624},{h:15,r:154895},{h:16,r:304741},{h:17,r:487603},{h:18,r:463952},{h:19,r:408231},{h:20,r:260020},{h:21,r:72060},{h:22,r:12644}],feb:[{h:10,r:3927},{h:11,r:8369},{h:12,r:8354},{h:13,r:4396},{h:14,r:4474},{h:15,r:12590},{h:16,r:28054},{h:17,r:49497},{h:18,r:29502},{h:19,r:18625},{h:20,r:10401},{h:21,r:3381}]},
+            M:{all:[{h:10,r:21180},{h:11,r:52051},{h:12,r:53282},{h:13,r:39396},{h:14,r:31760},{h:15,r:45488},{h:16,r:90658},{h:17,r:148628},{h:18,r:170454},{h:19,r:150557},{h:20,r:81593},{h:21,r:15534},{h:22,r:2060}],feb:[{h:10,r:987},{h:11,r:1919},{h:12,r:2230},{h:13,r:1266},{h:14,r:874},{h:15,r:2332},{h:16,r:2791},{h:17,r:4671},{h:18,r:4888},{h:19,r:4157},{h:20,r:2765},{h:21,r:2031}]},
+            B:{all:[{h:10,r:13747},{h:11,r:31706},{h:12,r:28997},{h:13,r:18635},{h:14,r:25014},{h:15,r:47832},{h:16,r:114771},{h:17,r:200470},{h:18,r:128646},{h:19,r:95530},{h:20,r:60459},{h:21,r:17009},{h:22,r:5044}],feb:[{h:10,r:2940},{h:11,r:5860},{h:12,r:4595},{h:13,r:2169},{h:14,r:2648},{h:15,r:7462},{h:16,r:20702},{h:17,r:38088},{h:18,r:17713},{h:19,r:9005},{h:20,r:4250},{h:21,r:670},{h:22,r:86}]},
+            C:{all:[{h:10,r:7529},{h:11,r:31756},{h:12,r:59240},{h:13,r:39712},{h:14,r:27850},{h:15,r:61575},{h:16,r:99312},{h:17,r:138505},{h:18,r:164852},{h:19,r:162144},{h:20,r:117969},{h:21,r:39516},{h:22,r:5539}],feb:[{h:11,r:590},{h:12,r:1529},{h:13,r:961},{h:14,r:952},{h:15,r:2796},{h:16,r:4560},{h:17,r:6738},{h:18,r:6901},{h:19,r:5463},{h:20,r:3387},{h:21,r:679},{h:22,r:106}]}
+        };
 
-  <footer>Data from clean_database_M.csv · Client segments exclude RETAIL walk-ins · Generated Feb 2026</footer>
-</div>
+        const D_wk = {
+            ALL:{all:{wr:1305278,wdr:1341541},feb:{wr:97217,wdr:84545}},
+            M:{all:{wr:414467,wdr:488658},feb:{wr:14409,wdr:16501}},
+            B:{all:{wr:414204,wdr:373787},feb:{wr:65343,wdr:50846}},
+            C:{all:{wr:476607,wdr:479096},feb:{wr:17465,wdr:17198}}
+        };
 
-<script>
-const D = {"kpis": {"total_revenue": 872419.59, "total_checks": 41998, "registered_clients": 14480, "avg_check": 16.5, "revenue_2025": 429811.19, "revenue_2024": 405986.53, "yoy_growth": 5.9, "retail_pct": 38.0}, "monthly": [{"year": 2024, "month": 1, "month_year": "2024-01", "revenue": 33405.03, "checks": 2253, "clients": 310, "items": 3524.0, "yoy": null}, {"year": 2024, "month": 2, "month_year": "2024-02", "revenue": 43601.43, "checks": 2654, "clients": 1678, "items": 4415.0, "yoy": null}, {"year": 2024, "month": 3, "month_year": "2024-03", "revenue": 45434.08, "checks": 2886, "clients": 1812, "items": 4630.0, "yoy": null}, {"year": 2024, "month": 4, "month_year": "2024-04", "revenue": 27620.690000000002, "checks": 1761, "clients": 1157, "items": 2650.0, "yoy": null}, {"year": 2024, "month": 5, "month_year": "2024-05", "revenue": 28661.25, "checks": 1647, "clients": 1060, "items": 2586.0, "yoy": null}, {"year": 2024, "month": 6, "month_year": "2024-06", "revenue": 25067.32, "checks": 1617, "clients": 994, "items": 2441.0, "yoy": null}, {"year": 2024, "month": 7, "month_year": "2024-07", "revenue": 30005.59, "checks": 2015, "clients": 1134, "items": 3097.0, "yoy": null}, {"year": 2024, "month": 8, "month_year": "2024-08", "revenue": 38307.33, "checks": 2523, "clients": 1176, "items": 4000.0, "yoy": null}, {"year": 2024, "month": 9, "month_year": "2024-09", "revenue": 35384.13, "checks": 2246, "clients": 931, "items": 3506.0, "yoy": null}, {"year": 2024, "month": 10, "month_year": "2024-10", "revenue": 33205.81, "checks": 1996, "clients": 937, "items": 3142.0, "yoy": null}, {"year": 2024, "month": 11, "month_year": "2024-11", "revenue": 36596.21, "checks": 2067, "clients": 866, "items": 3903.0, "yoy": null}, {"year": 2024, "month": 12, "month_year": "2024-12", "revenue": 28697.66, "checks": 1653, "clients": 778, "items": 2807.0, "yoy": null}, {"year": 2025, "month": 1, "month_year": "2025-01", "revenue": 34070.29, "checks": 1858, "clients": 965, "items": 2973.0, "yoy": 2.0}, {"year": 2025, "month": 2, "month_year": "2025-02", "revenue": 36943.450000000004, "checks": 2220, "clients": 1305, "items": 3748.0, "yoy": -15.3}, {"year": 2025, "month": 3, "month_year": "2025-03", "revenue": 44631.8, "checks": 2603, "clients": 1335, "items": 4429.0, "yoy": -1.8}, {"year": 2025, "month": 4, "month_year": "2025-04", "revenue": 34040.94, "checks": 2041, "clients": 1107, "items": 3584.0, "yoy": 23.2}, {"year": 2025, "month": 5, "month_year": "2025-05", "revenue": 29635.36, "checks": 1696, "clients": 948, "items": 2854.0, "yoy": 3.4}, {"year": 2025, "month": 6, "month_year": "2025-06", "revenue": 25203.8, "checks": 1525, "clients": 747, "items": 2960.0, "yoy": 0.5}, {"year": 2025, "month": 7, "month_year": "2025-07", "revenue": 41868.95, "checks": 2383, "clients": 1123, "items": 5662.0, "yoy": 39.5}, {"year": 2025, "month": 8, "month_year": "2025-08", "revenue": 47507.65, "checks": 3198, "clients": 1736, "items": 6053.0, "yoy": 24.0}, {"year": 2025, "month": 9, "month_year": "2025-09", "revenue": 37720.840000000004, "checks": 2290, "clients": 1213, "items": 4227.0, "yoy": 6.6}, {"year": 2025, "month": 10, "month_year": "2025-10", "revenue": 31355.34, "checks": 1713, "clients": 976, "items": 3431.0, "yoy": -5.6}, {"year": 2025, "month": 11, "month_year": "2025-11", "revenue": 38124.52, "checks": 1971, "clients": 1115, "items": 3945.0, "yoy": 4.2}, {"year": 2025, "month": 12, "month_year": "2025-12", "revenue": 28708.25, "checks": 1578, "clients": 921, "items": 3436.0, "yoy": 0.0}, {"year": 2026, "month": 1, "month_year": "2026-01", "revenue": 36621.87, "checks": 2035, "clients": 1258, "items": 4128.0, "yoy": 7.5}], "categories": [{"item_category": "Rental - 1 hour", "revenue": 427624.4, "count": 32559}, {"item_category": "Birthday Package", "revenue": 96727.86, "count": 1427}, {"item_category": "Pass", "revenue": 90466.3, "count": 2147}, {"item_category": "Food/Menu", "revenue": 81926.1, "count": 728}, {"item_category": "Rental - 30 min", "revenue": 70832.77, "count": 8569}, {"item_category": "Other", "revenue": 37587.090000000004, "count": 4162}, {"item_category": "Socks", "revenue": 28828.0, "count": 11872}, {"item_category": "Voucher/Bonus", "revenue": 27492.0, "count": 1018}, {"item_category": "Children Services", "revenue": 8448.2, "count": 1459}, {"item_category": "Rental - Other", "revenue": 1989.3, "count": 41}, {"item_category": "Lottery/Prize", "revenue": 402.0, "count": 276}, {"item_category": "Rental - 2 hours", "revenue": 80.19, "count": 2}, {"item_category": "Discount/Promotion", "revenue": 9.46, "count": 932}, {"item_category": "Gift Certificate", "revenue": 5.92, "count": 559}], "dow": [{"day_of_week": 0, "day_name": "Monday", "revenue": 81629.19, "checks": 4957}, {"day_of_week": 1, "day_name": "Tuesday", "revenue": 85634.04000000001, "checks": 5070}, {"day_of_week": 2, "day_name": "Wednesday", "revenue": 93054.8, "checks": 5469}, {"day_of_week": 3, "day_name": "Thursday", "revenue": 96177.35, "checks": 5516}, {"day_of_week": 4, "day_name": "Friday", "revenue": 115798.05, "checks": 6311}, {"day_of_week": 5, "day_name": "Saturday", "revenue": 213247.4, "checks": 11949}, {"day_of_week": 6, "day_name": "Sunday", "revenue": 186878.76, "checks": 11271}], "hourly": [{"hour": 10, "revenue": 20192.99, "checks": 1283}, {"hour": 11, "revenue": 50131.75, "checks": 2977}, {"hour": 12, "revenue": 51052.01, "checks": 3377}, {"hour": 13, "revenue": 38148.33, "checks": 2207}, {"hour": 14, "revenue": 30943.74, "checks": 1519}, {"hour": 15, "revenue": 43156.2, "checks": 2462}, {"hour": 16, "revenue": 87877.43000000001, "checks": 5385}, {"hour": 17, "revenue": 143957.01, "checks": 8704}, {"hour": 18, "revenue": 165565.67, "checks": 10162}, {"hour": 19, "revenue": 146519.47, "checks": 8040}, {"hour": 20, "revenue": 78828.83, "checks": 4084}, {"hour": 21, "revenue": 13503.36, "checks": 722}, {"hour": 22, "revenue": 2060.32, "checks": 40}, {"hour": 23, "revenue": 482.48, "checks": 9}], "segments": [{"segment": "Champion (30+)", "revenue": 22852.95, "clients": 22, "checks": 1425}, {"segment": "Loyal (15-29)", "revenue": 34694.85, "clients": 143, "checks": 2689}, {"segment": "New (1-2)", "revenue": 231810.83000000002, "clients": 10947, "checks": 12722}, {"segment": "Occasional (3-6)", "revenue": 154159.19, "clients": 2616, "checks": 9798}, {"segment": "Regular (7-14)", "revenue": 97790.83, "clients": 752, "checks": 6784}], "seg_monthly": [{"month_year": "2024-01", "year": 2024, "month": 1, "segment": "Champion (30+)", "revenue": 112.3, "clients": 3}, {"month_year": "2024-01", "year": 2024, "month": 1, "segment": "Loyal (15-29)", "revenue": 114.0, "clients": 7}, {"month_year": "2024-01", "year": 2024, "month": 1, "segment": "New (1-2)", "revenue": 2291.8, "clients": 167}, {"month_year": "2024-01", "year": 2024, "month": 1, "segment": "Occasional (3-6)", "revenue": 1738.4, "clients": 87}, {"month_year": "2024-01", "year": 2024, "month": 1, "segment": "Regular (7-14)", "revenue": 901.4, "clients": 45}, {"month_year": "2024-02", "year": 2024, "month": 2, "segment": "Champion (30+)", "revenue": 203.6, "clients": 11}, {"month_year": "2024-02", "year": 2024, "month": 2, "segment": "Loyal (15-29)", "revenue": 1453.1000000000001, "clients": 62}, {"month_year": "2024-02", "year": 2024, "month": 2, "segment": "New (1-2)", "revenue": 16057.7, "clients": 1001}, {"month_year": "2024-02", "year": 2024, "month": 2, "segment": "Occasional (3-6)", "revenue": 7896.7, "clients": 403}, {"month_year": "2024-02", "year": 2024, "month": 2, "segment": "Regular (7-14)", "revenue": 4114.2, "clients": 200}, {"month_year": "2024-03", "year": 2024, "month": 3, "segment": "Champion (30+)", "revenue": 495.7, "clients": 15}, {"month_year": "2024-03", "year": 2024, "month": 3, "segment": "Loyal (15-29)", "revenue": 1645.71, "clients": 62}, {"month_year": "2024-03", "year": 2024, "month": 3, "segment": "New (1-2)", "revenue": 16334.800000000001, "clients": 993}, {"month_year": "2024-03", "year": 2024, "month": 3, "segment": "Occasional (3-6)", "revenue": 10292.35, "clients": 496}, {"month_year": "2024-03", "year": 2024, "month": 3, "segment": "Regular (7-14)", "revenue": 5541.59, "clients": 245}, {"month_year": "2024-04", "year": 2024, "month": 4, "segment": "Champion (30+)", "revenue": 344.90000000000003, "clients": 12}, {"month_year": "2024-04", "year": 2024, "month": 4, "segment": "Loyal (15-29)", "revenue": 1481.2, "clients": 56}, {"month_year": "2024-04", "year": 2024, "month": 4, "segment": "New (1-2)", "revenue": 8353.17, "clients": 532}, {"month_year": "2024-04", "year": 2024, "month": 4, "segment": "Occasional (3-6)", "revenue": 6066.12, "clients": 350}, {"month_year": "2024-04", "year": 2024, "month": 4, "segment": "Regular (7-14)", "revenue": 3660.4100000000003, "clients": 206}, {"month_year": "2024-05", "year": 2024, "month": 5, "segment": "Champion (30+)", "revenue": 617.63, "clients": 9}, {"month_year": "2024-05", "year": 2024, "month": 5, "segment": "Loyal (15-29)", "revenue": 1734.14, "clients": 69}, {"month_year": "2024-05", "year": 2024, "month": 5, "segment": "New (1-2)", "revenue": 7845.42, "clients": 441}, {"month_year": "2024-05", "year": 2024, "month": 5, "segment": "Occasional (3-6)", "revenue": 6508.6900000000005, "clients": 346}, {"month_year": "2024-05", "year": 2024, "month": 5, "segment": "Regular (7-14)", "revenue": 3542.6400000000003, "clients": 194}, {"month_year": "2024-06", "year": 2024, "month": 6, "segment": "Champion (30+)", "revenue": 683.9, "clients": 15}, {"month_year": "2024-06", "year": 2024, "month": 6, "segment": "Loyal (15-29)", "revenue": 1773.3400000000001, "clients": 76}, {"month_year": "2024-06", "year": 2024, "month": 6, "segment": "New (1-2)", "revenue": 5547.03, "clients": 365}, {"month_year": "2024-06", "year": 2024, "month": 6, "segment": "Occasional (3-6)", "revenue": 5374.39, "clients": 326}, {"month_year": "2024-06", "year": 2024, "month": 6, "segment": "Regular (7-14)", "revenue": 4242.03, "clients": 211}, {"month_year": "2024-07", "year": 2024, "month": 7, "segment": "Champion (30+)", "revenue": 539.21, "clients": 17}, {"month_year": "2024-07", "year": 2024, "month": 7, "segment": "Loyal (15-29)", "revenue": 1296.78, "clients": 70}, {"month_year": "2024-07", "year": 2024, "month": 7, "segment": "New (1-2)", "revenue": 7461.24, "clients": 482}, {"month_year": "2024-07", "year": 2024, "month": 7, "segment": "Occasional (3-6)", "revenue": 5777.87, "clients": 337}, {"month_year": "2024-07", "year": 2024, "month": 7, "segment": "Regular (7-14)", "revenue": 4752.0, "clients": 227}, {"month_year": "2024-08", "year": 2024, "month": 8, "segment": "Champion (30+)", "revenue": 193.0, "clients": 11}, {"month_year": "2024-08", "year": 2024, "month": 8, "segment": "Loyal (15-29)", "revenue": 1468.25, "clients": 67}, {"month_year": "2024-08", "year": 2024, "month": 8, "segment": "New (1-2)", "revenue": 7836.900000000001, "clients": 477}, {"month_year": "2024-08", "year": 2024, "month": 8, "segment": "Occasional (3-6)", "revenue": 7095.84, "clients": 383}, {"month_year": "2024-08", "year": 2024, "month": 8, "segment": "Regular (7-14)", "revenue": 5275.25, "clients": 237}, {"month_year": "2024-09", "year": 2024, "month": 9, "segment": "Champion (30+)", "revenue": 369.52000000000004, "clients": 17}, {"month_year": "2024-09", "year": 2024, "month": 9, "segment": "Loyal (15-29)", "revenue": 1661.6200000000001, "clients": 74}, {"month_year": "2024-09", "year": 2024, "month": 9, "segment": "New (1-2)", "revenue": 5252.39, "clients": 346}, {"month_year": "2024-09", "year": 2024, "month": 9, "segment": "Occasional (3-6)", "revenue": 4912.2300000000005, "clients": 305}, {"month_year": "2024-09", "year": 2024, "month": 9, "segment": "Regular (7-14)", "revenue": 3219.4, "clients": 188}, {"month_year": "2024-10", "year": 2024, "month": 10, "segment": "Champion (30+)", "revenue": 580.13, "clients": 17}, {"month_year": "2024-10", "year": 2024, "month": 10, "segment": "Loyal (15-29)", "revenue": 1389.92, "clients": 67}, {"month_year": "2024-10", "year": 2024, "month": 10, "segment": "New (1-2)", "revenue": 5795.32, "clients": 357}, {"month_year": "2024-10", "year": 2024, "month": 10, "segment": "Occasional (3-6)", "revenue": 4751.37, "clients": 299}, {"month_year": "2024-10", "year": 2024, "month": 10, "segment": "Regular (7-14)", "revenue": 3398.27, "clients": 196}, {"month_year": "2024-11", "year": 2024, "month": 11, "segment": "Champion (30+)", "revenue": 361.71, "clients": 14}, {"month_year": "2024-11", "year": 2024, "month": 11, "segment": "Loyal (15-29)", "revenue": 1412.6200000000001, "clients": 68}, {"month_year": "2024-11", "year": 2024, "month": 11, "segment": "New (1-2)", "revenue": 6024.18, "clients": 328}, {"month_year": "2024-11", "year": 2024, "month": 11, "segment": "Occasional (3-6)", "revenue": 4605.29, "clients": 267}, {"month_year": "2024-11", "year": 2024, "month": 11, "segment": "Regular (7-14)", "revenue": 3484.4700000000003, "clients": 188}, {"month_year": "2024-12", "year": 2024, "month": 12, "segment": "Champion (30+)", "revenue": 443.82, "clients": 17}, {"month_year": "2024-12", "year": 2024, "month": 12, "segment": "Loyal (15-29)", "revenue": 1408.42, "clients": 59}, {"month_year": "2024-12", "year": 2024, "month": 12, "segment": "New (1-2)", "revenue": 5606.2300000000005, "clients": 307}, {"month_year": "2024-12", "year": 2024, "month": 12, "segment": "Occasional (3-6)", "revenue": 4524.04, "clients": 228}, {"month_year": "2024-12", "year": 2024, "month": 12, "segment": "Regular (7-14)", "revenue": 3251.2400000000002, "clients": 166}, {"month_year": "2025-01", "year": 2025, "month": 1, "segment": "Champion (30+)", "revenue": 457.92, "clients": 19}, {"month_year": "2025-01", "year": 2025, "month": 1, "segment": "Loyal (15-29)", "revenue": 2043.5900000000001, "clients": 79}, {"month_year": "2025-01", "year": 2025, "month": 1, "segment": "New (1-2)", "revenue": 6476.61, "clients": 362}, {"month_year": "2025-01", "year": 2025, "month": 1, "segment": "Occasional (3-6)", "revenue": 5265.9400000000005, "clients": 288}, {"month_year": "2025-01", "year": 2025, "month": 1, "segment": "Regular (7-14)", "revenue": 4079.08, "clients": 216}, {"month_year": "2025-02", "year": 2025, "month": 2, "segment": "Champion (30+)", "revenue": 533.53, "clients": 20}, {"month_year": "2025-02", "year": 2025, "month": 2, "segment": "Loyal (15-29)", "revenue": 1824.24, "clients": 80}, {"month_year": "2025-02", "year": 2025, "month": 2, "segment": "New (1-2)", "revenue": 10393.77, "clients": 574}, {"month_year": "2025-02", "year": 2025, "month": 2, "segment": "Occasional (3-6)", "revenue": 6755.17, "clients": 385}, {"month_year": "2025-02", "year": 2025, "month": 2, "segment": "Regular (7-14)", "revenue": 3945.87, "clients": 245}, {"month_year": "2025-03", "year": 2025, "month": 3, "segment": "Champion (30+)", "revenue": 457.12, "clients": 16}, {"month_year": "2025-03", "year": 2025, "month": 3, "segment": "Loyal (15-29)", "revenue": 1759.32, "clients": 75}, {"month_year": "2025-03", "year": 2025, "month": 3, "segment": "New (1-2)", "revenue": 11789.14, "clients": 640}, {"month_year": "2025-03", "year": 2025, "month": 3, "segment": "Occasional (3-6)", "revenue": 6985.2, "clients": 382}, {"month_year": "2025-03", "year": 2025, "month": 3, "segment": "Regular (7-14)", "revenue": 4410.26, "clients": 221}, {"month_year": "2025-04", "year": 2025, "month": 4, "segment": "Champion (30+)", "revenue": 260.22, "clients": 12}, {"month_year": "2025-04", "year": 2025, "month": 4, "segment": "Loyal (15-29)", "revenue": 1410.91, "clients": 59}, {"month_year": "2025-04", "year": 2025, "month": 4, "segment": "New (1-2)", "revenue": 8992.84, "clients": 529}, {"month_year": "2025-04", "year": 2025, "month": 4, "segment": "Occasional (3-6)", "revenue": 5543.85, "clients": 305}, {"month_year": "2025-04", "year": 2025, "month": 4, "segment": "Regular (7-14)", "revenue": 3593.4700000000003, "clients": 201}, {"month_year": "2025-05", "year": 2025, "month": 5, "segment": "Champion (30+)", "revenue": 393.8, "clients": 16}, {"month_year": "2025-05", "year": 2025, "month": 5, "segment": "Loyal (15-29)", "revenue": 1564.3, "clients": 62}, {"month_year": "2025-05", "year": 2025, "month": 5, "segment": "New (1-2)", "revenue": 6834.62, "clients": 400}, {"month_year": "2025-05", "year": 2025, "month": 5, "segment": "Occasional (3-6)", "revenue": 5000.650000000001, "clients": 279}, {"month_year": "2025-05", "year": 2025, "month": 5, "segment": "Regular (7-14)", "revenue": 3493.44, "clients": 190}, {"month_year": "2025-06", "year": 2025, "month": 6, "segment": "Champion (30+)", "revenue": 269.42, "clients": 12}, {"month_year": "2025-06", "year": 2025, "month": 6, "segment": "Loyal (15-29)", "revenue": 1027.23, "clients": 55}, {"month_year": "2025-06", "year": 2025, "month": 6, "segment": "New (1-2)", "revenue": 5262.89, "clients": 311}, {"month_year": "2025-06", "year": 2025, "month": 6, "segment": "Occasional (3-6)", "revenue": 4186.62, "clients": 231}, {"month_year": "2025-06", "year": 2025, "month": 6, "segment": "Regular (7-14)", "revenue": 2643.11, "clients": 137}, {"month_year": "2025-07", "year": 2025, "month": 7, "segment": "Champion (30+)", "revenue": 365.62, "clients": 11}, {"month_year": "2025-07", "year": 2025, "month": 7, "segment": "Loyal (15-29)", "revenue": 1409.48, "clients": 63}, {"month_year": "2025-07", "year": 2025, "month": 7, "segment": "New (1-2)", "revenue": 11088.380000000001, "clients": 554}, {"month_year": "2025-07", "year": 2025, "month": 7, "segment": "Occasional (3-6)", "revenue": 5844.59, "clients": 302}, {"month_year": "2025-07", "year": 2025, "month": 7, "segment": "Regular (7-14)", "revenue": 3959.4, "clients": 192}, {"month_year": "2025-08", "year": 2025, "month": 8, "segment": "Champion (30+)", "revenue": 438.52000000000004, "clients": 16}, {"month_year": "2025-08", "year": 2025, "month": 8, "segment": "Loyal (15-29)", "revenue": 1198.6200000000001, "clients": 66}, {"month_year": "2025-08", "year": 2025, "month": 8, "segment": "New (1-2)", "revenue": 17381.0, "clients": 898}, {"month_year": "2025-08", "year": 2025, "month": 8, "segment": "Occasional (3-6)", "revenue": 9895.65, "clients": 498}, {"month_year": "2025-08", "year": 2025, "month": 8, "segment": "Regular (7-14)", "revenue": 5766.27, "clients": 257}, {"month_year": "2025-09", "year": 2025, "month": 9, "segment": "Champion (30+)", "revenue": 207.4, "clients": 12}, {"month_year": "2025-09", "year": 2025, "month": 9, "segment": "Loyal (15-29)", "revenue": 1297.9, "clients": 61}, {"month_year": "2025-09", "year": 2025, "month": 9, "segment": "New (1-2)", "revenue": 10107.15, "clients": 557}, {"month_year": "2025-09", "year": 2025, "month": 9, "segment": "Occasional (3-6)", "revenue": 7677.32, "clients": 379}, {"month_year": "2025-09", "year": 2025, "month": 9, "segment": "Regular (7-14)", "revenue": 4146.6900000000005, "clients": 203}, {"month_year": "2025-10", "year": 2025, "month": 10, "segment": "Champion (30+)", "revenue": 13337.54, "clients": 17}, {"month_year": "2025-10", "year": 2025, "month": 10, "segment": "Loyal (15-29)", "revenue": 849.7, "clients": 50}, {"month_year": "2025-10", "year": 2025, "month": 10, "segment": "New (1-2)", "revenue": 9104.91, "clients": 480}, {"month_year": "2025-10", "year": 2025, "month": 10, "segment": "Occasional (3-6)", "revenue": 4948.4800000000005, "clients": 274}, {"month_year": "2025-10", "year": 2025, "month": 10, "segment": "Regular (7-14)", "revenue": 3114.71, "clients": 155}, {"month_year": "2025-11", "year": 2025, "month": 11, "segment": "Champion (30+)", "revenue": 375.09999999999997, "clients": 16}, {"month_year": "2025-11", "year": 2025, "month": 11, "segment": "Loyal (15-29)", "revenue": 1109.1, "clients": 58}, {"month_year": "2025-11", "year": 2025, "month": 11, "segment": "New (1-2)", "revenue": 9869.13, "clients": 514}, {"month_year": "2025-11", "year": 2025, "month": 11, "segment": "Occasional (3-6)", "revenue": 7477.17, "clients": 334}, {"month_year": "2025-11", "year": 2025, "month": 11, "segment": "Regular (7-14)", "revenue": 4173.13, "clients": 192}, {"month_year": "2025-12", "year": 2025, "month": 12, "segment": "Champion (30+)", "revenue": 348.44, "clients": 12}, {"month_year": "2025-12", "year": 2025, "month": 12, "segment": "Loyal (15-29)", "revenue": 918.3100000000001, "clients": 47}, {"month_year": "2025-12", "year": 2025, "month": 12, "segment": "New (1-2)", "revenue": 12064.44, "clients": 424}, {"month_year": "2025-12", "year": 2025, "month": 12, "segment": "Occasional (3-6)", "revenue": 5047.04, "clients": 264}, {"month_year": "2025-12", "year": 2025, "month": 12, "segment": "Regular (7-14)", "revenue": 4379.07, "clients": 173}, {"month_year": "2026-01", "year": 2026, "month": 1, "segment": "Champion (30+)", "revenue": 462.9, "clients": 13}, {"month_year": "2026-01", "year": 2026, "month": 1, "segment": "Loyal (15-29)", "revenue": 1443.05, "clients": 56}, {"month_year": "2026-01", "year": 2026, "month": 1, "segment": "New (1-2)", "revenue": 18039.77, "clients": 661}, {"month_year": "2026-01", "year": 2026, "month": 1, "segment": "Occasional (3-6)", "revenue": 9988.22, "clients": 342}, {"month_year": "2026-01", "year": 2026, "month": 1, "segment": "Regular (7-14)", "revenue": 4703.43, "clients": 185}], "weekend": [{"label": "Weekday", "revenue": 472293.43, "checks": 25194}, {"label": "Weekend", "revenue": 400126.16000000003, "checks": 21979}], "season": [{"season": "Fall", "revenue": 212386.85}, {"season": "Spring", "revenue": 210024.12}, {"season": "Summer", "revenue": 207960.64}, {"season": "Winter", "revenue": 242047.98}], "tod": [{"time_of_day": "Afternoon (12-15)", "revenue": 120010.69, "checks": 6584}, {"time_of_day": "Evening (18-21)", "revenue": 244009.37, "checks": 12916}, {"time_of_day": "Late Afternoon (15-18)", "revenue": 385745.35000000003, "checks": 21815}, {"time_of_day": "Morning (9-12)", "revenue": 120111.38, "checks": 7380}, {"time_of_day": "Night (21-24)", "revenue": 2542.8, "checks": 49}], "top_items": [{"item_name": "Alquiler Limon Loco 1 hora fin de SEMANA", "revenue": 289636.0, "qty": 30363.0}, {"item_name": "Alquiler Limon Loco 1 hora entre SEMANA", "revenue": 137988.4, "qty": 16166.0}, {"item_name": "Pase Limon Loco 6 horas", "revenue": 80837.4, "qty": 2026.0}, {"item_name": "Alquiler Limon Loco 30 min. fin de SEMANA", "revenue": 47180.8, "qty": 7399.0}, {"item_name": "Promesa de Cumplea\u00f1os Limon Loco", "revenue": 39150.0, "qty": 783.0}, {"item_name": "D\u00eda de Fiesta de cumplea\u00f1os (10 personas) sin comida", "revenue": 32035.0, "qty": 215.0}, {"item_name": "Alquiler Limon Loco 30 min. entre SEMANA", "revenue": 23651.9, "qty": 4400.0}, {"item_name": "Suplemento por cumplea\u00f1os de lunes a Viernes (10 personas) sin comida", "revenue": 21420.0, "qty": 180.0}, {"item_name": "eliminado BONO Black Friday -50% - 19,90e 6 H (LL1 LL2)", "revenue": 13074.3, "qty": 657.0}, {"item_name": "Cumplea\u00f1os 2 horas con 1 persona de SALIDA sin comida", "revenue": 11860.4, "qty": 596.0}]};
+        const D_seg = {
+            ALL:{all:{l:["New (1-2)","Occasional (3-6)","Regular (7-14)","Loyal (15-29)","Champion (30+)"],c:[65890,36166,17897,6594,4330],r:[869107,442836,198488,70401,40956]},feb:{l:["New (1-2)","Occasional (3-6)","Regular (7-14)","Loyal (15-29)","Champion (30+)"],c:[7423,3112,1071,351,103],r:[108517,43181,12388,3937,1054]}},
+            M:{all:{l:["New (1-2)","Occasional (3-6)","Regular (7-14)","Loyal (15-29)","Champion (30+)"],c:[11192,2723,794,161,25],r:[240507,163302,101925,40960,356431]},feb:{l:["New (1-2)","Occasional (3-6)","Regular (7-14)","Loyal (15-29)","Champion (30+)"],c:[547,345,197,63,11],r:[13387,8923,4791,1679,2129]}},
+            B:{all:{l:["New (1-2)","Occasional (3-6)","Regular (7-14)","Loyal (15-29)","Champion (30+)"],c:[7218,1111,110,14,3],r:[471444,154132,24226,7312,130877]},feb:{l:["New (1-2)","Occasional (3-6)","Regular (7-14)","Loyal (15-29)","Champion (30+)"],c:[1529,446,73,13,3],r:[80971,22451,2917,1051,8799]}},
+            C:{all:{l:["New (1-2)","Occasional (3-6)","Regular (7-14)","Loyal (15-29)","Champion (30+)"],c:[7484,2134,610,109,14],r:[158798,123909,72188,22129,578680]},feb:{l:["New (1-2)","Occasional (3-6)","Regular (7-14)","Loyal (15-29)","Champion (30+)"],c:[890,517,241,67,12],r:[15802,10193,4651,1207,2810]}}
+        };
 
-const fmt = n => n==null?'—':'€'+n.toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0});
-const fmtK = n => n>=1000?'€'+(n/1000).toFixed(1)+'k':'€'+n.toFixed(0);
-const fmtN = n => n==null?'—':n.toLocaleString('es-ES');
+        const D_ti = {
+            ALL:{all:[{i:"Alquiler LL 1h fin SEMANA",r:590717,q:61572},{i:"Alquiler LL 1h entre SEMANA",r:268468,q:31492},{i:"Alquiler LL 30m fin SEMANA",r:207522,q:31452},{i:"Entrada 1H V-D (por persona)",r:151518,q:10168},{i:"Pase LL 6 horas",r:142603,q:3574},{i:"Alquiler LL 30m entre SEMANA",r:101982,q:18496},{i:"Entrada Adultos LL3",r:72657,q:24215},{i:"Oferta Cumple 2H sin comida V-D",r:56497,q:3343},{i:"Promesa Cumpleaños LL",r:56450,q:1129},{i:"Entrada 1H L-J (por persona)",r:56063,q:4346}],feb:[{i:"Entrada 1H V-D (por persona)",r:24451,q:1641},{i:"Alquiler LL 1h fin SEMANA",r:19186,q:1930},{i:"Oferta Cumple 2H sin comida V-D",r:14940,q:884},{i:"Entrada Adultos LL3",r:10929,q:3643},{i:"Oferta Cumple 2H sin comida L-J",r:10385,q:697},{i:"Bono Invierno 8H 45d LL3",r:9404,q:157},{i:"Cumple 2H sin comida V-D",r:9174,q:461},{i:"Alquiler LL 30m fin SEMANA",r:7052,q:1022},{i:"Alquiler LL 1h entre SEMANA",r:6639,q:742},{i:"Entrada 1H L-J (por persona)",r:5779,q:448}]},
+            M:{all:[{i:"Alquiler LL 1h fin SEMANA",r:297231,q:19351},{i:"Alquiler LL 1h entre SEMANA",r:141719,q:11142},{i:"Pase LL 6 horas",r:83551,q:2022},{i:"Alquiler LL 30m fin SEMANA",r:48140,q:5327},{i:"Promesa Cumpleaños LL",r:40000,q:788},{i:"Fiesta Cumple 10pers sin comida",r:32482,q:218},{i:"Alquiler LL 30m entre SEMANA",r:24212,q:3232},{i:"Suplemento Cumple L-V 10pers",r:21539,q:180},{i:"BONO Black Friday -50%",r:13074,q:641},{i:"Cumple 2H 1pers SALIDA sin comida",r:12935,q:145}],feb:[{i:"Alquiler LL 1h fin SEMANA",r:7623,q:580},{i:"Alquiler LL 1h entre SEMANA",r:3738,q:312},{i:"Pase LL 6 horas",r:2713,q:67},{i:"Fiesta Otoño V-D 2H",r:2086,q:20},{i:"Bono Invierno 8H 45d",r:2035,q:51},{i:"Fiesta Otoño L-J 2H",r:1174,q:14},{i:"Bebé Madrugadores 1h",r:1122,q:187},{i:"Cumple 2H 1pers SALIDA",r:1075,q:12},{i:"Entrada ilimitada L-J 15e",r:1020,q:44},{i:"Alquiler LL 30m fin SEMANA",r:959,q:108}]},
+            B:{all:[{i:"Entrada 1H V-D LL3",r:151518,q:7039},{i:"Entrada Adultos LL3",r:72657,q:13419},{i:"Oferta Cumple 2H sin comida V-D",r:56497,q:278},{i:"Entrada 1H L-J LL3",r:56063,q:2955},{i:"Bono Invierno 8H 45d LL3",r:31867,q:519},{i:"Oferta Cumple 2H sin comida L-J",r:29994,q:148},{i:"Bono 6H LL3",r:29351,q:474},{i:"Cumple 2H sin comida V-D LL3",r:28875,q:146},{i:"BONO Black Friday -50% LL3",r:21827,q:686},{i:"Visitas grupales 2H LL3",r:17351,q:81}],feb:[{i:"Entrada 1H V-D LL3",r:24451,q:1160},{i:"Oferta Cumple 2H sin comida V-D",r:14940,q:75},{i:"Entrada Adultos LL3",r:10929,q:2011},{i:"Oferta Cumple 2H sin comida L-J",r:10385,q:51},{i:"Bono Invierno 8H 45d LL3",r:9404,q:157},{i:"Cumple 2H sin comida V-D",r:9174,q:30},{i:"Entrada 1H L-J LL3",r:5779,q:308},{i:"Bebé Madrugadores 1h LL3",r:3926,q:432},{i:"MENU Larrea",r:2480,q:29},{i:"Cumple 2H sin comida L-J LL3",r:2383,q:14}]},
+            C:{all:[{i:"Alquiler LL 1h fin SEMANA",r:293486,q:19716},{i:"Alquiler LL 30m fin SEMANA",r:159382,q:16433},{i:"Alquiler LL 1h entre SEMANA",r:126685,q:9883},{i:"Alquiler LL 30m entre SEMANA",r:77770,q:9970},{i:"Pase LL 6 horas",r:59052,q:1421},{i:"Calcetines Logo",r:18916,q:5447},{i:"Menu Burger King",r:13591,q:161},{i:"Calcetines antideslizantes",r:13574,q:4119},{i:"BONO Black Friday -50%",r:12855,q:634},{i:"Promesa Cumpleaños LL",r:11000,q:220}],feb:[{i:"Alquiler LL 1h fin SEMANA",r:11563,q:825},{i:"Alquiler LL 30m fin SEMANA",r:6093,q:644},{i:"Alquiler LL 1h entre SEMANA",r:2901,q:237},{i:"Alquiler LL 30m entre SEMANA",r:1811,q:237},{i:"Oferta Cumple 2H sin comida L-J",r:1558,q:35},{i:"Promesa Cumpleaños LL",r:1450,q:29},{i:"Pase LL 6 horas",r:1357,q:34},{i:"Menu Burger King",r:1036,q:11},{i:"Oferta Cumple V-D",r:735,q:13},{i:"Bebé Madrugadores 1h",r:564,q:98}]}
+        };
 
-// Chart.js defaults
-Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif";
-Chart.defaults.font.size = 11;
-Chart.defaults.color = '#636e72';
-Chart.defaults.plugins.legend.labels.usePointStyle = true;
-Chart.defaults.plugins.legend.labels.padding = 16;
-Chart.defaults.elements.bar.borderRadius = 6;
-Chart.defaults.elements.line.tension = 0.35;
-Chart.defaults.elements.point.radius = 2;
-Chart.defaults.elements.point.hoverRadius = 5;
-Chart.defaults.scale.grid = { color: 'rgba(163,177,198,0.15)' };
+        const D_rfm = {
+            ALL:{
+                dist:[{s:"Champions",c:5348},{s:"Loyal Customers",c:11065},{s:"Potential Loyalists",c:11000},{s:"At Risk",c:4220},{s:"Lost",c:5090}],
+                rev:[{s:"Champions",r:522255},{s:"Loyal Customers",r:643549},{s:"Potential Loyalists",r:237217},{s:"At Risk",r:99821},{s:"Lost",r:118947}],
+                avg:[{s:"Champions",rec:62.2,freq:4.93,mon:97.65},{s:"Loyal Customers",rec:239.6,freq:2.68,mon:58.16},{s:"Potential Loyalists",rec:111.0,freq:1.06,mon:21.57},{s:"At Risk",rec:417.7,freq:1.16,mon:23.65},{s:"Lost",rec:411.4,freq:1.0,mon:23.37}],
+                stats:{total:36723,avgRec:219.5,avgFreq:2.12,avgMon:44.16},
+                cross:[{rfm:"Champions",New:1277,Occasional:2661,Regular:1092,Loyal:271,Champion:47},{rfm:"Loyal Customers",New:6352,Occasional:3617,Regular:936,Loyal:144,Champion:16},{rfm:"Potential Loyalists",New:9983,Occasional:847,Regular:152,Loyal:17,Champion:1},{rfm:"At Risk",New:4073,Occasional:143,Regular:4,Loyal:0,Champion:0},{rfm:"Lost",New:4824,Occasional:258,Regular:8,Loyal:0,Champion:0}],
+                migration:[{s:"Champions",active:4086,inactive:1262},{s:"Loyal Customers",active:2667,inactive:8398},{s:"Potential Loyalists",active:6162,inactive:4838},{s:"At Risk",active:0,inactive:4220},{s:"Lost",active:0,inactive:5090}]
+            },
+            M:{
+                dist:[{s:"Champions",c:2460},{s:"Loyal Customers",c:4683},{s:"Potential Loyalists",c:4515},{s:"At Risk",c:2214},{s:"Lost",c:1899}],
+                rev:[{s:"Champions",r:229890},{s:"Loyal Customers",r:205491},{s:"Potential Loyalists",r:75017},{s:"At Risk",r:30027},{s:"Lost",r:29937}],
+                avg:[{s:"Champions",rec:100.5,freq:5.73,mon:93.45},{s:"Loyal Customers",rec:372.1,freq:2.77,mon:43.88},{s:"Potential Loyalists",rec:183.9,freq:1.06,mon:16.62},{s:"At Risk",rec:607.7,freq:1.16,mon:13.56},{s:"Lost",rec:612.2,freq:1.0,mon:15.76}],
+                stats:{total:15771,avgRec:337.8,avgFreq:2.3,avgMon:36.17},
+                cross:[{rfm:"Champions",New:475,Occasional:1198,Regular:595,Loyal:160,Champion:32},{rfm:"Loyal Customers",New:2684,Occasional:1620,Regular:332,Loyal:43,Champion:4},{rfm:"Potential Loyalists",New:4115,Occasional:315,Regular:71,Loyal:13,Champion:1},{rfm:"At Risk",New:2188,Occasional:26,Regular:0,Loyal:0,Champion:0},{rfm:"Lost",New:1878,Occasional:21,Regular:0,Loyal:0,Champion:0}],
+                migration:[{s:"Champions",active:1198,inactive:1262},{s:"Loyal Customers",active:494,inactive:4189},{s:"Potential Loyalists",active:1127,inactive:3388},{s:"At Risk",active:0,inactive:2214},{s:"Lost",active:0,inactive:1899}]
+            },
+            B:{
+                dist:[{s:"Champions",c:1195},{s:"Loyal Customers",c:2484},{s:"Potential Loyalists",c:2599},{s:"At Risk",c:1371},{s:"Lost",c:806}],
+                rev:[{s:"Champions",r:182640},{s:"Loyal Customers",r:262576},{s:"Potential Loyalists",r:108364},{s:"At Risk",r:60447},{s:"Lost",r:45026}],
+                avg:[{s:"Champions",rec:23.3,freq:3.73,mon:152.84},{s:"Loyal Customers",rec:98.8,freq:1.92,mon:105.71},{s:"Potential Loyalists",rec:40.0,freq:1.06,mon:41.69},{s:"At Risk",rec:161.5,freq:1.05,mon:44.09},{s:"Lost",rec:162.7,freq:1.0,mon:55.86}],
+                stats:{total:8455,avgRec:86.3,avgFreq:1.68,avgMon:77.95},
+                cross:[{rfm:"Champions",New:437,Occasional:646,Regular:96,Loyal:14,Champion:2},{rfm:"Loyal Customers",New:2014,Occasional:455,Regular:15,Loyal:0,Champion:0},{rfm:"Potential Loyalists",New:2588,Occasional:11,Regular:0,Loyal:0,Champion:0},{rfm:"At Risk",New:1369,Occasional:2,Regular:0,Loyal:0,Champion:0},{rfm:"Lost",New:806,Occasional:0,Regular:0,Loyal:0,Champion:0}],
+                migration:[{s:"Champions",active:1195,inactive:0},{s:"Loyal Customers",active:1219,inactive:1265},{s:"Potential Loyalists",active:2516,inactive:83},{s:"At Risk",active:0,inactive:1371},{s:"Lost",active:0,inactive:806}]
+            },
+            C:{
+                dist:[{s:"Champions",c:1693},{s:"Loyal Customers",c:3898},{s:"Potential Loyalists",c:3886},{s:"At Risk",c:635},{s:"Lost",c:2385}],
+                rev:[{s:"Champions",r:109725},{s:"Loyal Customers",r:175482},{s:"Potential Loyalists",r:53836},{s:"At Risk",r:9348},{s:"Lost",r:43983}],
+                avg:[{s:"Champions",rec:34.0,freq:4.6,mon:64.81},{s:"Loyal Customers",rec:170.1,freq:3.06,mon:45.02},{s:"Potential Loyalists",rec:73.9,freq:1.07,mon:13.85},{s:"At Risk",rec:308.2,freq:1.39,mon:14.72},{s:"Lost",rec:335.5,freq:1.0,mon:18.44}],
+                stats:{total:12497,avgRec:160.3,avgFreq:2.17,avgMon:31.4},
+                cross:[{rfm:"Champions",New:365,Occasional:817,Regular:401,Loyal:97,Champion:13},{rfm:"Loyal Customers",New:1654,Occasional:1542,Regular:589,Loyal:101,Champion:12},{rfm:"Potential Loyalists",New:3280,Occasional:521,Regular:81,Loyal:4,Champion:0},{rfm:"At Risk",New:516,Occasional:115,Regular:4,Loyal:0,Champion:0},{rfm:"Lost",New:2140,Occasional:237,Regular:8,Loyal:0,Champion:0}],
+                migration:[{s:"Champions",active:1693,inactive:0},{s:"Loyal Customers",active:954,inactive:2944},{s:"Potential Loyalists",active:2519,inactive:1367},{s:"At Risk",active:0,inactive:635},{s:"Lost",active:0,inactive:2385}]
+            }
+        };
 
-const P = {
-  accent: '#6c5ce7', accent2: '#00cec9', accent3: '#0984e3',
-  purple: '#a29bfe', teal: '#81ecec', blue: '#74b9ff',
-  pink: '#fd79a8', orange: '#fab1a0', green: '#55efc4',
-  yellow: '#ffeaa7', red: '#ff7675', gray: '#b2bec3'
-};
-const segColors = {
-  'New (1-2)': P.gray, 'Occasional (3-6)': P.blue,
-  'Regular (7-14)': P.accent2, 'Loyal (15-29)': P.accent,
-  'Champion (30+)': P.pink
-};
-const segOrder = ['New (1-2)','Occasional (3-6)','Regular (7-14)','Loyal (15-29)','Champion (30+)'];
+        const D_parkFeb = {M:{r:30910.05,ch:1882,cl:1163},B:{r:116188.98,ch:4382,cl:2064},C:{r:34663.05,ch:2797,cl:1727}};
 
-let charts = {};
-let currentYear = 'all';
+        // ============ STATE & FILTERS ============
+        let cv = 'all'; // time view
+        let cp = 'ALL'; // park view
+        let charts = {};
 
-// Year filter buttons
-function buildFilters() {
-  const c = document.getElementById('yearFilters');
-  ['all','2024','2025','2026'].forEach(y => {
-    const b = document.createElement('button');
-    b.className = 'filter-btn' + (y==='all'?' active':'');
-    b.textContent = y==='all'?'All Years':y;
-    b.dataset.year = y;
-    b.onclick = () => {
-      document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      currentYear = y;
-      render();
-    };
-    c.appendChild(b);
-  });
-}
+        // ============ UTILITIES ============
+        function fmt(n) { return (n || 0).toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+        function fmti(n) { return (Math.round(n || 0)).toLocaleString('es-ES'); }
 
-function getMonthly() {
-  return currentYear==='all' ? D.monthly : D.monthly.filter(r=>r.year===parseInt(currentYear));
-}
+        function filterData(data, view) {
+            if (view === 'all') return data;
+            if (view === 'feb') return data.filter(d => d.m === '2026-02');
+            return data.filter(d => d.m.startsWith(view));
+        }
 
-function renderKPIs() {
-  const m = getMonthly();
-  const rev = m.reduce((s,r)=>s+r.revenue,0);
-  const checks = m.reduce((s,r)=>s+r.checks,0);
-  const clients = m.reduce((s,r)=>s+r.clients,0);
-  const items = m.reduce((s,r)=>s+r.items,0);
-  const avgCheck = checks>0?rev/checks:0;
+        function getParkData() {
+            const d = cp === 'ALL' ? filterData(D_monthly, cv) : filterData(D_park[cp], cv);
+            return d.slice().sort((a, b) => a.m.localeCompare(b.m));
+        }
 
-  let yoyHtml = '<div class="sub neutral">All periods</div>';
-  if (currentYear==='2025') {
-    const g = D.kpis.yoy_growth;
-    yoyHtml = `<div class="sub ${g>=0?'up':'down'}">${g>=0?'↑':'↓'} ${Math.abs(g)}% vs 2024</div>`;
-  }
+        function getCategories() {
+            const view = cv === 'feb' ? 'feb' : 'all';
+            return D_cats[cp][view];
+        }
 
-  document.getElementById('kpiRow').innerHTML = `
-    <div class="card kpi"><div class="label">Revenue</div><div class="value">${fmt(Math.round(rev))}</div>${yoyHtml}</div>
-    <div class="card kpi"><div class="label">Checks</div><div class="value">${fmtN(checks)}</div><div class="sub neutral">${m.length} months</div></div>
-    <div class="card kpi"><div class="label">Avg Check</div><div class="value">${fmt(Math.round(avgCheck*100)/100)}</div><div class="sub neutral">per transaction</div></div>
-    <div class="card kpi"><div class="label">Clients</div><div class="value">${fmtN(D.kpis.registered_clients)}</div><div class="sub neutral">registered</div></div>
-    <div class="card kpi"><div class="label">Items Sold</div><div class="value">${fmtN(Math.round(items))}</div><div class="sub neutral">${D.kpis.retail_pct}% retail</div></div>
-  `;
-}
+        function getRfmData() {
+            return D_rfm[cp];
+        }
 
-function buildRevChart() {
-  const ctx = document.getElementById('revChart');
-  if(charts.rev) charts.rev.destroy();
-  const m = getMonthly();
-  charts.rev = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels: m.map(r=>r.month_year),
-      datasets:[
-        {label:'Revenue',data:m.map(r=>Math.round(r.revenue)),backgroundColor:'rgba(108,92,231,0.6)',hoverBackgroundColor:'#6c5ce7',yAxisID:'y',order:2},
-        {label:'Checks',data:m.map(r=>r.checks),type:'line',borderColor:P.accent2,backgroundColor:'transparent',borderWidth:2.5,pointBackgroundColor:P.accent2,yAxisID:'y1',order:1}
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      interaction:{intersect:false,mode:'index'},
-      plugins:{legend:{position:'top'}},
-      scales:{
-        y:{position:'left',ticks:{callback:v=>fmtK(v)},grid:{color:'rgba(163,177,198,0.12)'}},
-        y1:{position:'right',grid:{drawOnChartArea:false}},
-        x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}}
-      }
-    }
-  });
-}
+        function updateKPIs() {
+            const data = getParkData();
+            const r = data.reduce((s, d) => s + d.r, 0);
+            const ch = data.reduce((s, d) => s + d.ch, 0);
+            const cl = data.reduce((s, d) => s + d.cl, 0);
+            const ac = ch > 0 ? r / ch : 0;
+            const rc = cl > 0 ? r / cl : 0;
 
-function buildCatChart() {
-  const ctx = document.getElementById('catChart');
-  if(charts.cat) charts.cat.destroy();
-  const top7 = D.categories.slice(0,7);
-  const cols = [P.accent,P.accent2,P.accent3,P.purple,P.teal,P.pink,P.orange];
-  charts.cat = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels:top7.map(r=>r.item_category),
-      datasets:[{data:top7.map(r=>Math.round(r.revenue)),backgroundColor:cols.map(c=>c+'cc'),borderColor:cols,borderWidth:1}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,indexAxis:'y',
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.raw)}}},
-      scales:{x:{ticks:{callback:v=>fmtK(v)},grid:{color:'rgba(163,177,198,0.12)'}},y:{grid:{display:false}}}
-    }
-  });
-}
+            let yoy = '';
+            if (cv === 'feb' && cp !== 'ALL') {
+                const feb26 = D_park[cp].find(d => d.m === '2026-02');
+                const feb25 = D_park[cp].find(d => d.m === '2025-02');
+                if (feb26 && feb25) {
+                    const chg = ((feb26.r - feb25.r) / feb25.r) * 100;
+                    const cls = chg >= 0 ? 'positive' : 'negative';
+                    yoy = `<div class="kpi-change ${cls}">${chg >= 0 ? '+' : ''}${chg.toFixed(1)}% YoY</div>`;
+                }
+            } else if (cv === 'feb' && cp === 'ALL') {
+                const feb26 = D_monthly.find(d => d.m === '2026-02');
+                const feb25 = D_monthly.find(d => d.m === '2025-02');
+                if (feb26 && feb25) {
+                    const chg = ((feb26.r - feb25.r) / feb25.r) * 100;
+                    const cls = chg >= 0 ? 'positive' : 'negative';
+                    yoy = `<div class="kpi-change ${cls}">${chg >= 0 ? '+' : ''}${chg.toFixed(1)}% YoY</div>`;
+                }
+            }
 
-function buildSegChart() {
-  const ctx = document.getElementById('segChart');
-  if(charts.seg) charts.seg.destroy();
-  const ordered = segOrder.map(s=>D.segments.find(r=>r.segment===s)||{segment:s,revenue:0,clients:0,checks:0});
-  charts.seg = new Chart(ctx, {
-    type:'doughnut',
-    data:{
-      labels:ordered.map(r=>r.segment),
-      datasets:[{data:ordered.map(r=>Math.round(r.revenue)),backgroundColor:segOrder.map(s=>segColors[s]),borderColor:'var(--bg)',borderWidth:3}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,cutout:'62%',
-      plugins:{
-        legend:{position:'right',labels:{padding:10,font:{size:11}}},
-        tooltip:{callbacks:{label:c=>{const d=ordered[c.dataIndex];return c.label+': '+fmt(c.raw)+' ('+fmtN(d.clients)+' clients)';}}}
-      }
-    }
-  });
-}
+            document.getElementById('kpiRow').innerHTML = `
+                <div class="kpi-card"><div class="kpi-label">Revenue</div><div class="kpi-value">€${fmt(r)}</div>${yoy}</div>
+                <div class="kpi-card"><div class="kpi-label">Checks</div><div class="kpi-value">${fmti(ch)}</div></div>
+                <div class="kpi-card"><div class="kpi-label">Avg Check</div><div class="kpi-value">€${fmt(ac)}</div></div>
+                <div class="kpi-card"><div class="kpi-label">Clients</div><div class="kpi-value">${fmti(cl)}</div></div>
+                <div class="kpi-card"><div class="kpi-label">Rev/Client</div><div class="kpi-value">€${fmt(rc)}</div></div>
+            `;
+        }
 
-function buildDowChart() {
-  const ctx = document.getElementById('dowChart');
-  if(charts.dow) charts.dow.destroy();
-  const colors = D.dow.map(r=>r.day_of_week>=5?P.accent:'rgba(108,92,231,0.35)');
-  charts.dow = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels:D.dow.map(r=>r.day_name.substring(0,3)),
-      datasets:[{data:D.dow.map(r=>Math.round(r.revenue)),backgroundColor:colors}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.raw)}}},
-      scales:{y:{ticks:{callback:v=>fmtK(v)},grid:{color:'rgba(163,177,198,0.12)'}},x:{grid:{display:false}}}
-    }
-  });
-}
+        function updateCharts() {
+            updateRevenueByPark();
+            updateMonthlyRevenue();
+            updateCategory();
+            updateSegments();
+            updateDow();
+            updateHourly();
+            updateWeekend();
+            updateRFMOverview();
+            updateRFMDistribution();
+            updateRFMRevenue();
+            updateRFMMigration();
+        }
 
-function buildHourChart() {
-  const ctx = document.getElementById('hourChart');
-  if(charts.hour) charts.hour.destroy();
-  charts.hour = new Chart(ctx, {
-    type:'line',
-    data:{
-      labels:D.hourly.map(r=>r.hour+':00'),
-      datasets:[{
-        label:'Revenue',data:D.hourly.map(r=>Math.round(r.revenue)),
-        borderColor:P.accent,backgroundColor:'rgba(108,92,231,0.08)',fill:true,borderWidth:2.5,
-        pointBackgroundColor:P.accent
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.raw)}}},
-      scales:{y:{ticks:{callback:v=>fmtK(v)},grid:{color:'rgba(163,177,198,0.12)'}},x:{grid:{display:false}}}
-    }
-  });
-}
+        function updateRevenueByPark() {
+            if (cp !== 'ALL') {
+                const data = getParkData();
+                const ctx = document.getElementById('chartRevenueByPark').getContext('2d');
+                if (charts.revenueByPark) charts.revenueByPark.destroy();
+                charts.revenueByPark = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.m),
+                        datasets: [{
+                            label: `Park ${cp}`,
+                            data: data.map(d => d.r),
+                            backgroundColor: cp === 'M' ? '#6c5ce7' : cp === 'B' ? '#e17055' : '#00cec9',
+                            borderRadius: 8,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+                });
+            } else {
+                const data = getParkData();
+                const byPark = { M: {}, B: {}, C: {} };
+                data.forEach(d => {
+                    ['M', 'B', 'C'].forEach(p => {
+                        const pdata = D_park[p].find(x => x.m === d.m);
+                        if (pdata) {
+                            byPark[p][d.m] = pdata.r;
+                        }
+                    });
+                });
+                const months = [...new Set(data.map(d => d.m))].sort();
+                const ctx = document.getElementById('chartRevenueByPark').getContext('2d');
+                if (charts.revenueByPark) charts.revenueByPark.destroy();
+                charts.revenueByPark = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [
+                            {
+                                label: 'Park M',
+                                data: months.map(m => byPark.M[m] || 0),
+                                backgroundColor: '#6c5ce7',
+                                borderRadius: 8,
+                                borderSkipped: false
+                            },
+                            {
+                                label: 'Park B',
+                                data: months.map(m => byPark.B[m] || 0),
+                                backgroundColor: '#e17055',
+                                borderRadius: 8,
+                                borderSkipped: false
+                            },
+                            {
+                                label: 'Park C',
+                                data: months.map(m => byPark.C[m] || 0),
+                                backgroundColor: '#00cec9',
+                                borderRadius: 8,
+                                borderSkipped: false
+                            }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: true } } }
+                });
+            }
+        }
 
-function buildWkdChart() {
-  const ctx = document.getElementById('wkdChart');
-  if(charts.wkd) charts.wkd.destroy();
-  charts.wkd = new Chart(ctx, {
-    type:'doughnut',
-    data:{
-      labels:D.weekend.map(r=>r.label),
-      datasets:[{data:D.weekend.map(r=>Math.round(r.revenue)),backgroundColor:[P.accent3,P.accent],borderColor:'var(--bg)',borderWidth:3}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,cutout:'62%',
-      plugins:{
-        legend:{position:'bottom',labels:{padding:14}},
-        tooltip:{callbacks:{label:c=>c.label+': '+fmt(c.raw)+' ('+fmtN(D.weekend[c.dataIndex].checks)+' checks)'}}
-      }
-    }
-  });
-}
+        function updateMonthlyRevenue() {
+            const data = getParkData();
+            const ctx = document.getElementById('chartMonthlyRevenue').getContext('2d');
+            if (charts.monthlyRevenue) charts.monthlyRevenue.destroy();
+            charts.monthlyRevenue = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.m),
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: data.map(d => d.r),
+                            backgroundColor: '#6c5ce7',
+                            yAxisID: 'y',
+                            borderRadius: 8,
+                            borderSkipped: false
+                        },
+                        {
+                            label: 'Checks',
+                            data: data.map(d => d.ch),
+                            borderColor: '#00b894',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            type: 'line',
+                            yAxisID: 'y1',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { type: 'linear', display: true, position: 'left', beginAtZero: true, title: { display: true, text: 'Revenue (€)' } },
+                        y1: { type: 'linear', display: true, position: 'right', beginAtZero: true, title: { display: true, text: 'Checks' }, grid: { drawOnChartArea: false } }
+                    },
+                    plugins: { legend: { display: true } }
+                }
+            });
+        }
 
-function buildItemsTable() {
-  const tbody = document.querySelector('#itemsTable tbody');
-  tbody.innerHTML = D.top_items.map(r=>{
-    const name = r.item_name.length>45?r.item_name.substring(0,42)+'...':r.item_name;
-    return `<tr><td title="${r.item_name}">${name}</td><td class="text-right">${fmt(Math.round(r.revenue))}</td><td class="text-right">${fmtN(Math.round(r.qty))}</td></tr>`;
-  }).join('');
-}
+        function updateCategory() {
+            const cats = getCategories();
+            const ctx = document.getElementById('chartCategory').getContext('2d');
+            if (charts.category) charts.category.destroy();
+            charts.category = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: cats.map(c => c.c),
+                    datasets: [{
+                        data: cats.map(c => c.r),
+                        backgroundColor: ['#6c5ce7', '#00cec9', '#0984e3', '#fdcb6e', '#d63031', '#00b894', '#fab1a0', '#74b9ff', '#81ecec']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 11 }, padding: 12 } } } }
+            });
+        }
 
-function buildMonthTable() {
-  const tbody = document.querySelector('#monthTable tbody');
-  const m = getMonthly();
-  tbody.innerHTML = m.map(r=>{
-    const yc = r.yoy==null?'':r.yoy>=0?'yoy-pos':'yoy-neg';
-    const ys = r.yoy==null?'—':(r.yoy>=0?'+':'')+r.yoy+'%';
-    return `<tr><td>${r.month_year}</td><td class="text-right">${fmt(Math.round(r.revenue))}</td><td class="text-right">${fmtN(r.checks)}</td><td class="text-right ${yc}">${ys}</td></tr>`;
-  }).join('');
-}
+        function updateSegments() {
+            const seg = cv === 'feb' ? D_seg[cp].feb : D_seg[cp].all;
+            const ctx = document.getElementById('chartSegments').getContext('2d');
+            if (charts.segments) charts.segments.destroy();
+            charts.segments = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: seg.l,
+                    datasets: [{
+                        label: 'Clients',
+                        data: seg.c,
+                        backgroundColor: ['#6c5ce7', '#00cec9', '#0984e3', '#fdcb6e', '#d63031'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            });
+        }
 
-function render() {
-  renderKPIs();
-  buildRevChart();
-  buildCatChart();
-  buildSegChart();
-  buildDowChart();
-  buildHourChart();
-  buildWkdChart();
-  buildItemsTable();
-  buildMonthTable();
-}
+        function updateDow() {
+            const dow = cv === 'feb' ? D_dow[cp].feb : D_dow[cp].all;
+            const ctx = document.getElementById('chartDow').getContext('2d');
+            if (charts.dow) charts.dow.destroy();
+            charts.dow = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dow.map(d => d.d),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: dow.map(d => d.r),
+                        backgroundColor: '#6c5ce7',
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            });
+        }
 
-buildFilters();
-render();
-</script>
+        function updateHourly() {
+            const hr = cv === 'feb' ? D_hr[cp].feb : D_hr[cp].all;
+            const ctx = document.getElementById('chartHourly').getContext('2d');
+            if (charts.hourly) charts.hourly.destroy();
+            charts.hourly = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: hr.map(h => h.h + ':00'),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: hr.map(h => h.r),
+                        backgroundColor: '#00cec9',
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function updateWeekend() {
+            const wk = cv === 'feb' ? D_wk[cp].feb : D_wk[cp].all;
+            const ctx = document.getElementById('chartWeekend').getContext('2d');
+            if (charts.weekend) charts.weekend.destroy();
+            charts.weekend = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Weekend', 'Weekday'],
+                    datasets: [{
+                        data: [wk.wr, wk.wdr],
+                        backgroundColor: ['#e17055', '#6c5ce7']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            });
+        }
+
+        function updateRFMOverview() {
+            const rfm = getRfmData();
+            const ctx = document.getElementById('chartRFMOverview').getContext('2d');
+            if (charts.rfmOverview) charts.rfmOverview.destroy();
+            charts.rfmOverview = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: rfm.dist.map(d => d.s),
+                    datasets: [{
+                        label: 'Clients',
+                        data: rfm.dist.map(d => d.c),
+                        backgroundColor: ['#6c5ce7', '#00cec9', '#0984e3', '#fdcb6e', '#d63031'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function updateRFMDistribution() {
+            const rfm = getRfmData();
+            const ctx = document.getElementById('chartRFMDistribution').getContext('2d');
+            if (charts.rfmDistribution) charts.rfmDistribution.destroy();
+            charts.rfmDistribution = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: rfm.dist.map(d => d.s),
+                    datasets: [{
+                        label: 'Clients',
+                        data: rfm.dist.map(d => d.c),
+                        backgroundColor: ['#6c5ce7', '#00cec9', '#0984e3', '#fdcb6e', '#d63031'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function updateRFMRevenue() {
+            const rfm = getRfmData();
+            const ctx = document.getElementById('chartRFMRevenue').getContext('2d');
+            if (charts.rfmRevenue) charts.rfmRevenue.destroy();
+            charts.rfmRevenue = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: rfm.rev.map(r => r.s),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: rfm.rev.map(r => r.r),
+                        backgroundColor: ['#6c5ce7', '#00cec9', '#0984e3', '#fdcb6e', '#d63031'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function updateRFMMigration() {
+            const rfm = getRfmData();
+            const ctx = document.getElementById('chartRFMMigration').getContext('2d');
+            if (charts.rfmMigration) charts.rfmMigration.destroy();
+            charts.rfmMigration = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: rfm.migration.map(m => m.s),
+                    datasets: [
+                        {
+                            label: 'Active (<90d)',
+                            data: rfm.migration.map(m => m.active),
+                            backgroundColor: '#00b894'
+                        },
+                        {
+                            label: 'Inactive (>=90d)',
+                            data: rfm.migration.map(m => m.inactive),
+                            backgroundColor: '#d63031'
+                        }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { display: true } } }
+            });
+        }
+
+        function updateTables() {
+            updateTopItems();
+            updateMonthlyTable();
+            updateParkFebTable();
+            updateRFMMetricsTable();
+            updateRFMCrosstab();
+            updateRFMSummary();
+        }
+
+        function updateTopItems() {
+            const items = cv === 'feb' ? D_ti[cp].feb : D_ti[cp].all;
+            const tbody = document.querySelector('#tableTopItems tbody');
+            tbody.innerHTML = items.map((it, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${it.i}</td>
+                    <td>€${fmt(it.r)}</td>
+                    <td>${fmti(it.q)}</td>
+                    <td>€${fmt(it.r / it.q)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateMonthlyTable() {
+            const data = getParkData();
+            const source = cp === 'ALL' ? D_monthly : D_park[cp];
+            const tbody = document.querySelector('#tableMonthly tbody');
+            tbody.innerHTML = data.map(d => {
+                let yoyHtml = '';
+                const yr = parseInt(d.m.substring(0, 4));
+                const mo = d.m.substring(5);
+                const prevM = (yr - 1) + '-' + mo;
+                const prev = source.find(x => x.m === prevM);
+                if (prev) {
+                    const chg = ((d.r - prev.r) / prev.r) * 100;
+                    const cls = chg >= 0 ? 'positive' : 'negative';
+                    yoyHtml = `<span class="${cls}">${chg >= 0 ? '+' : ''}${chg.toFixed(1)}%</span>`;
+                }
+                return `<tr><td>${d.m}</td><td>€${fmt(d.r)}</td><td>${fmti(d.ch)}</td><td>€${fmt(d.ac)}</td><td>${fmti(d.cl)}</td><td>${yoyHtml || '—'}</td></tr>`;
+            }).join('');
+        }
+
+        function updateParkFebTable() {
+            const tbody = document.querySelector('#tableParkFeb tbody');
+            tbody.innerHTML = Object.entries(D_parkFeb).map(([p, d]) => `
+                <tr>
+                    <td>Park ${p}</td>
+                    <td>€${fmt(d.r)}</td>
+                    <td>${fmti(d.ch)}</td>
+                    <td>${fmti(d.cl)}</td>
+                    <td>€${fmt(d.r / d.ch)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateRFMMetricsTable() {
+            const rfm = getRfmData();
+            const tbody = document.querySelector('#tableRFMMetrics tbody');
+            tbody.innerHTML = rfm.avg.map((seg, i) => {
+                const dist = rfm.dist[i];
+                const rev = rfm.rev[i];
+                return `<tr>
+                    <td>${seg.s}</td>
+                    <td>${fmti(dist.c)}</td>
+                    <td>€${fmt(rev.r)}</td>
+                    <td>${seg.rec.toFixed(1)}</td>
+                    <td>${seg.freq.toFixed(2)}</td>
+                    <td>€${fmt(seg.mon)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function updateRFMCrosstab() {
+            const rfm = getRfmData();
+            const tbody = document.querySelector('#tableRFMCrosstab tbody');
+            tbody.innerHTML = rfm.cross.map(row => `<tr>
+                <td>${row.rfm}</td>
+                <td>${fmti(row.New)}</td>
+                <td>${fmti(row.Occasional)}</td>
+                <td>${fmti(row.Regular)}</td>
+                <td>${fmti(row.Loyal)}</td>
+                <td>${fmti(row.Champion)}</td>
+            </tr>`).join('');
+        }
+
+        function updateRFMSummary() {
+            const rfm = getRfmData();
+            document.getElementById('rfmTotalClients').textContent = fmti(rfm.stats.total);
+            document.getElementById('rfmAvgRecency').textContent = rfm.stats.avgRec.toFixed(1);
+            document.getElementById('rfmAvgFrequency').textContent = rfm.stats.avgFreq.toFixed(2);
+            document.getElementById('rfmAvgMonetary').textContent = fmt(rfm.stats.avgMon);
+        }
+
+        function setTimeView(v) {
+            cv = v;
+            document.querySelectorAll('.filter-buttons')[0].querySelectorAll('.btn').forEach((b, i) => {
+                b.classList.toggle('active', (i === 0 && v === 'all') || (i === 1 && v === '2024') || (i === 2 && v === '2025') || (i === 3 && v === '2026') || (i === 4 && v === 'feb'));
+            });
+            updateKPIs();
+            updateCharts();
+            updateTables();
+        }
+
+        function setParkView(p) {
+            cp = p;
+            document.querySelectorAll('.filter-buttons')[1].querySelectorAll('.btn').forEach((b, i) => {
+                b.classList.toggle('active', (i === 0 && p === 'ALL') || (i === 1 && p === 'M') || (i === 2 && p === 'B') || (i === 3 && p === 'C'));
+            });
+            updateKPIs();
+            updateCharts();
+            updateTables();
+        }
+
+        // ============ INIT ============
+        window.addEventListener('DOMContentLoaded', () => {
+            updateKPIs();
+            updateCharts();
+            updateTables();
+        });
+    </script>
 </body>
 </html>
